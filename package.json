@@ -1,0 +1,11 @@
+{
+    "name": "Lars-Bot",
+    "version": "69.69.69",
+    "description": "Dette er bot versjonen av lasr",
+    "main": "bot.js",
+    "author": "Joe Mama",
+    "dependencies": {
+        "discord.io": "^2.5.3",
+        "winston": "^3.2.1"
+    }
+}
