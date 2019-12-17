@@ -1,6 +1,6 @@
 {
     "name": "Lars-Bot",
-    "version": "69.69.69",
+    "version": "1.0.0",
     "description": "Dette er bot versjonen av lasr",
     "main": "bot.js",
     "author": "Joe Mama",
