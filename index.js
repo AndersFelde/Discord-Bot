@@ -98,6 +98,7 @@ Bot.on("message", msg => {
 
                 case "h":
                     msg.channel.send("Skriv !spam [hva du skal spamme] [hvor mange ganger]");
+                    break;
 
             }
         }
