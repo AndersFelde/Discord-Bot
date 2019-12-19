@@ -95,6 +95,9 @@ Bot.on("message", msg => {
                         msg.reply("skriv hva jeg skal spamme, og hvor mange ganger")
                     }
                     break;
+                
+                case "h":
+                    msg.
 
             }
 
