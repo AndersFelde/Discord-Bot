@@ -7,3 +7,4 @@ Trenger også dependecies:
 - Åpne cmd
 - Gå inn i folder hvor du har lastet ned programmet
 - "npm install discord.js --save"
+- du trenger også riktig toke(spør meg), og så må du legge den under "node_modules"/token.txt
