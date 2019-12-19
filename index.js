@@ -101,7 +101,6 @@ Bot.on("message", msg => {
                     break;
 
             }
-
         }
 
     }
