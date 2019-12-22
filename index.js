@@ -22,6 +22,8 @@ Bot.on("disconnect", () => {
 
 
 Bot.on("message", msg => {
+    let embedMessage = new Discord.RichEmbed()
+
     if (msg.author.id !== Bot.user.id) {
         //så den ikke svarer seg selv
         var content = msg.content;
@@ -30,7 +32,7 @@ Bot.on("message", msg => {
         }
 
         if (content.charAt(0) == prefix) {
-            let args = content.substring(prefix.length).split(" ");
+            let args = content.substring(prefix.length).toLowerCase().split(" ");
 
             switch (args[0]) {
                 case "play":
@@ -97,9 +99,30 @@ Bot.on("message", msg => {
                     break;
 
                 case "h":
-                    msg.channel.send("Skriv !spam [hva du skal spamme] [hvor mange ganger]");
+                    embedMessage = new Discord.RichEmbed()
+                        .setColor('#0099ff')
+                        .setTitle('Help')
+                        .setDescription('Help for commands')
+                        .setThumbnail('https://i.imgur.com/h2yoQh5.jpg')
+                        .addField('!play', 'Da svarer den bare play')
+                        .addField('!spam', '"[Det du vil spamme], [Hvor mange ganger](ikke mer enn 50)"')
+                        .addField('Tagging', 'Hvis du tagger sander eller meg på spam så fucker det den som sender')
+                        .setImage('https://i.imgur.com/h2yoQh5.jpg')
+                        .setTimestamp()
+                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
+
+                    msg.channel.send(embedMessage);
                     break;
 
+                case "dick":
+                    embedMessage = new Discord.RichEmbed()
+                        .setColor('#0099ff')
+                        .setTitle("DICK")
+                        .setDescription("noen ganger bruker den lang tid på å loade")
+                        .setImage("images/dick.jpg")
+                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
+                    msg.channel.send(embedMessage);
+                    break;
             }
         }
 
