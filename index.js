@@ -128,19 +128,29 @@ Bot.on("message", msg => {
                 
                 case "reddit":
                     api = require("./redditApi");
-                    api.post.then((post) =>{
-                        const title = post.title;
-                        const img = post.link;
-                        const author = post.author;
-    
-                        embedMessage = new Discord.RichEmbed()
-                        .setColor('#0099ff')
-                        .setTitle("Top reddit post fra r/dankmemes")
-                        .addField("Title", title)
-                        .setImage(img)
-                        .addField("Author", author)
-                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
-                        msg.channel.send(embedMessage);
+                    if(args[1]){
+                        sub = args[1];
+                    } else {
+                        sub = "dankmemes";
+                    }
+                    api.post(sub).then((post) =>{
+                        if(post){
+                            //sjekker om subreddit finnes
+                            const title = post.title;
+                            const img = post.link;
+                            const author = post.author;
+                            
+                            embedMessage = new Discord.RichEmbed()
+                            .setColor('#0099ff')
+                            .setTitle("Top reddit post fra r/" + sub)
+                            .addField("Title", title)
+                            .setImage(img)
+                            .addField("Author", author)
+                            .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
+                            msg.channel.send(embedMessage);
+                        } else {
+                            msg.channel.send("Finner ikke den subredditen")
+                        }
                     })
                     break;
                     }

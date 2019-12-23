@@ -1,5 +1,5 @@
 
-async function scrapeSubreddit() {
+module.exports.post = async function scrapeSubreddit(sub) {
 const snoowrap = require("snoowrap");
     
 const refreshToken = "79253737404-KS3pCbfvr46l6OXFkxa7p1cH2xM";
@@ -13,26 +13,32 @@ const api = new snoowrap({
 });
 
 
-console.log("Fant en post");    
 
-const subreddit = await api.getSubreddit('dankmemes');
-const topPost = await subreddit.getTop({time: 'day', limit: 1});
+const subreddit = await api.getSubreddit(sub);
+
+const topPost = await subreddit.getTop({time: 'day', limit: 100}).catch(() => console.log("Finner ikke subreddit"));
+if(typeof(topPost) == "undefined"){
+    return false;
+}
+
+const num = Math.floor((Math.random() * topPost.length) + 1);
+console.log(num);
 
 let post = {
-    link: topPost[0].url,
-    title: topPost[0].title,
-    author: topPost[0].author.name
+    link: topPost[num].url,
+    title: topPost[num].title,
+    author: topPost[num].author.name
 }
 
+console.log(post);
 /* console.log(post); */
 return post;
-}
+};
 
 
 
 /* const post2 = scrapeSubreddit();
 post2.then((a) => console.log(a));
  *//* console.log(post2); */
-const post = scrapeSubreddit();
-exports.post = post;
+/* const post = scrapeSubreddit(); */
 
