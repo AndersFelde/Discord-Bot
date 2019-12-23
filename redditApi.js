@@ -17,7 +17,7 @@ const api = new snoowrap({
 const subreddit = await api.getSubreddit(sub);
 
 const topPost = await subreddit.getTop({time: 'day', limit: 100}).catch(() => console.log("Finner ikke subreddit"));
-if(typeof(topPost) == "undefined"){
+if(typeof(topPost) == "undefined" || topPost.length == 0){
     return false;
 }
 
