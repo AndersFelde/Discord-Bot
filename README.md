@@ -7,4 +7,5 @@ Trenger også dependecies:
 - Åpne cmd
 - Gå inn i folder hvor du har lastet ned programmet
 - "npm install discord.js --save"
+- "npm install snoowrap --save"
 - du trenger også riktig token(spør meg), og så må du legge den under "node_modules"/token.txt

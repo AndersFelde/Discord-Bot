@@ -1,8 +1,10 @@
 const Discord = require("discord.js");
 const fs = require("fs");
 
+
 const Bot = new Discord.Client();
 const token = fs.readFileSync("node_modules/token.txt", "utf-8");
+
 const prefix = "!";
 
 Bot.login(token);
@@ -22,7 +24,7 @@ Bot.on("disconnect", () => {
 
 
 Bot.on("message", msg => {
-    let embedMessage = new Discord.RichEmbed()
+    let embedMessage = new Discord.RichEmbed();
 
     if (msg.author.id !== Bot.user.id) {
         //så den ikke svarer seg selv
@@ -115,16 +117,34 @@ Bot.on("message", msg => {
                     break;
 
                 case "dick":
+                    
                     embedMessage = new Discord.RichEmbed()
                         .setColor('#0099ff')
                         .setTitle("DICK")
-                        .setDescription("noen ganger bruker den lang tid på å loade")
-                        .setImage("images/dick.jpg")
+                        .setImage('https://www.totstoteens.co.nz/wp-content/uploads/2018/08/drawings.jpg')
                         .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
                     msg.channel.send(embedMessage);
                     break;
+                
+                case "reddit":
+                    api = require("./redditApi");
+                    api.post.then((post) =>{
+                        const title = post.title;
+                        const img = post.link;
+                        const author = post.author;
+    
+                        embedMessage = new Discord.RichEmbed()
+                        .setColor('#0099ff')
+                        .setTitle("Top reddit post fra r/dankmemes")
+                        .addField("Title", title)
+                        .setImage(img)
+                        .addField("Author", author)
+                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
+                        msg.channel.send(embedMessage);
+                    })
+                    break;
+                    }
             }
-        }
 
     }
 })
