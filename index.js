@@ -3,11 +3,22 @@ const fs = require("fs");
 
 
 const Bot = new Discord.Client();
-const token = fs.readFileSync("node_modules/token.txt", "utf-8");
+try {
+    token = fs.readFileSync("token.txt", "utf-8");
+} catch (error) {
+    console.log("Du trenger en token fil, som skal ligge i root og hete token.txt \n" +
+        error);
+}
+token = token.replace(/\s/g, '');
+//ta bort mellomrom, fucka meg hardt en gang
 
 const prefix = "!";
 
-Bot.login(token);
+try {
+    Bot.login(token);
+} catch (error) {
+    console.log("Feil token er oppgitt, boten startet derfor ikke");
+}
 
 Bot.on("ready", () => {
     console.log("Bot er online");
@@ -22,6 +33,8 @@ Bot.on("disconnect", () => {
     console.log("disconnected");
 });
 
+var servers = {};
+//for music
 
 Bot.on("message", msg => {
 
@@ -33,7 +46,7 @@ Bot.on("message", msg => {
         }
 
         if (content.charAt(0) == prefix) {
-            let args = content.substring(prefix.length).toLowerCase().split(" ");
+            const args = content.substring(prefix.length).toLowerCase().split(" ");
 
             switch (args[0]) {
                 case "spam":
@@ -113,13 +126,38 @@ Bot.on("message", msg => {
                     })
                     break;
                 case "play":
-                    if (!args[1]) {
-                        msg.channel.send("Du må sende en link");
+                    const argsPlay = content.substring(prefix.length).split(" ");
+                    //pga det vil fucke med linker når det alltid blir til lowercase
+                    if (!argsPlay[1]) {
+                        msg.channel.send("Du må ha et argument nr 2 som er en link: !play [link]");
                         return;
                     }
-                    const playFunc = require("./elements/play").play;
 
-                    playFunc(args[1], msg);
+                    if (!servers[msg.guild.id]) {
+                        servers[msg.guild.id] = {
+                            queue: []
+                        }
+                    }
+
+
+                    servers[msg.guild.id].dispatcher = require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]);
+
+                    break;
+
+                case "stop":
+                    if (!servers[msg.guild.id].dispatcher) {
+                        msg.channel.send("Det spilles ingen sanger nå");
+                        return;
+                    }
+                    require("./elements/music").stop(msg, servers[msg.guild.id]);
+                    break;
+
+                case "queue":
+
+                    break;
+
+                case "skip":
+                    require("./elements/music").skip(msg);
                     break;
 
             }
