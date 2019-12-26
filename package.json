@@ -18,6 +18,9 @@
   "homepage": "https://github.com/AndersFelde/Discord-Bot#readme",
   "dependencies": {
     "discord.js": "^11.5.1",
-    "snoowrap": "^1.20.1"
+    "is-image-url": "^1.1.8",
+    "opusscript": "0.0.7",
+    "snoowrap": "^1.20.1",
+    "ytdl-core": "^1.0.5"
   }
 }
