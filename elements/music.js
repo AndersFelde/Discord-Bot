@@ -37,8 +37,7 @@ module.exports.play = function (sLink, msg, server) {
         server.dispather = conn.playStream(ytdl(server.queue[0], {
             filter: "audioonly"
         }));
-
-        console.log(server.queue);
+        const dispatcher = server.dispatcher;
         server.queue.shift();
         console.log(server.queue);
         server.dispather.on("end", function () {
@@ -50,8 +49,7 @@ module.exports.play = function (sLink, msg, server) {
                 conn.disconnect();
             }
         })
-
-        return server.dispatcher;
+        return dispatcher;
     }
 
     server.queue.push(sLink);
