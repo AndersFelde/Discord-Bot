@@ -141,10 +141,11 @@ Bot.on("message", msg => {
 
 
                     servers[msg.guild.id].dispatcher = require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]);
-
+                    console.log(servers[msg.guild.id].dispatcher);
                     break;
 
                 case "stop":
+                    console.log(servers[msg.guild.id].dispatcher);
                     if (!servers[msg.guild.id].dispatcher) {
                         msg.channel.send("Det spilles ingen sanger nå");
                         return;
