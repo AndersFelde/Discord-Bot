@@ -129,8 +129,7 @@ Bot.on("message", msg => {
                     const argsPlay = content.substring(prefix.length).split(" ");
                     //pga det vil fucke med linker når det alltid blir til lowercase
                     if (!argsPlay[1]) {
-                        msg.channel.send("Du må ha et argument nr 2 som er en link: !play [link]");
-                        return;
+                        argsPlay[1] = false;
                     }
 
                     if (!servers[msg.guild.id]) {
@@ -140,12 +139,19 @@ Bot.on("message", msg => {
                     }
 
 
-                    servers[msg.guild.id].dispatcher = require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]);
-                    console.log(servers[msg.guild.id].dispatcher);
+                    async function x() {
+                        y = require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]).then((r) => {
+                            return r;
+                        })
+                        return await y;
+                    }
+                    servers[msg.guild.id].dispatcher = x().then((p) => {
+                        return p;
+                    });
+
                     break;
 
                 case "stop":
-                    console.log(servers[msg.guild.id].dispatcher);
                     if (!servers[msg.guild.id].dispatcher) {
                         msg.channel.send("Det spilles ingen sanger nå");
                         return;
@@ -154,6 +160,17 @@ Bot.on("message", msg => {
                     break;
 
                 case "queue":
+
+                    if (!servers[msg.guild.id]) {
+                        servers[msg.guild.id] = {
+                            queue: []
+                        }
+                    }
+
+                    var queue = servers[msg.guild.id].queue;
+                    const queueArgs = content.substring(prefix.length).split(" ");
+                    console.log(queue);
+                    servers[msg.guild.id].queue = require("./elements/music").queue(msg, queueArgs, queue);
 
                     break;
 

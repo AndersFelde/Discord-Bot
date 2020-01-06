@@ -1,46 +1,44 @@
 /* servers = {}; */
-
-module.exports.play = function (sLink, msg, server) {
-    const ytdl = require("ytdl-core");
-
-    const URL = require("url").URL;
-    const checkUrl = (a) => {
-        try {
-            new URL(a);
-            return true;
-        } catch (err) {
-            console.log("Sang URL error: \n" + err);
-            return false;
-        }
+const ytdl = require("ytdl-core");
+const discord = require("discord.js");
+const URL = require("url").URL;
+const checkUrl = (a) => {
+    try {
+        new URL(a);
+        return true;
+    } catch (err) {
+        console.log("Sang URL error: \n" + err);
+        return false;
     }
+}
 
+module.exports.play = async function (sLink, msg, server) {
 
-    if (!checkUrl(sLink)) {
-        msg.channel.send("Nop, ikke en valid URL");
+    if (sLink) {
+        if (!checkUrl(sLink)) {
+            msg.channel.send("Nop, ikke en valid URL");
+            return;
+        }
+        server.queue.push(sLink);
+
+    } else if (server.queue.length == 0) {
+        msg.channel.send("Det må være noen sanger i queue da");
         return;
     }
+
 
     if (!msg.member.voiceChannel) {
         msg.channel.send("Du må være i en voice-channel");
         return;
     }
 
-    /*    if (!servers) {
-           servers = {
-               queue: []
-           }
-       }
-    */
 
     function play(conn, msg) {
-        console.log(server.queue);
-        server.dispather = conn.playStream(ytdl(server.queue[0], {
+        server.dispatcher = conn.playStream(ytdl(server.queue[0], {
             filter: "audioonly"
         }));
-        const dispatcher = server.dispatcher;
         server.queue.shift();
-        console.log(server.queue);
-        server.dispather.on("end", function () {
+        server.dispatcher.on("end", function () {
             console.log("ferdig med sang");
 
             if (server.queue[0]) {
@@ -49,35 +47,88 @@ module.exports.play = function (sLink, msg, server) {
                 conn.disconnect();
             }
         })
-        return dispatcher;
+        return server.dispatcher;
+
     }
 
-    server.queue.push(sLink);
 
-    if (!msg.guild.voiceConnection) msg.member.voiceChannel.join().then(function (conn) {
-        x = play(conn, msg);
-        return x;
-    })
+    if (!msg.guild.voiceConnection) {
+        x = msg.member.voiceChannel.join().then(function (conn) {
+            k = play(conn, msg)
+            return k;
+
+        })
+        return await x;
+    }
+
+
 }
 
 module.exports.stop = function stop(msg, server) {
 
-    console.log(server);
     if (msg.guild.voiceConnection) {
-        for (let i = server.queue.length; i >= 0; i--) {
-            server.queue.splice(i, 1);
+        try {
+            server.dispatcher.end();
+            msg.channel.send("Stoppet sangen, spiller neste sang i queue");
+            console.log(msg.guild.connection);
+            if (msg.guild.connnection) {
+                msg.guild.voiceConnection.disconnect();
+            }
+
+        } catch (e) {
+            msg.channel.send("Det ser ut som det har skjedd noe feil med stoppingen");
+            console.log(e);
+            console.log(server.dispatcher);
         }
-        server.dispatcher.end();
-        console.log("Stopped queue");
-        msg.channel.send("Stoppet queue, ingenting er nå i queue");
+        console.log("Stopped song");
     }
 
-    if (msg.guild.connnection) msg.guild.voiceConnection.disconnect();
 
 }
 
-module.exports.queue = function queue() {
+module.exports.queue = function queue(msg, args, queue) {
+    switch (args[1]) {
+        case "add":
+            if (!args[2]) {
+                msg.channel.send("Du må ha noe jeg skal adde da");
+                break;
+            }
+            if (!checkUrl(args[2])) {
+                msg.channel.send("Nop, ikke en valid URL");
+                break;
+            }
+            try {
+                queue.push(args[2]);
+                msg.channel.send("Har lag til \n'" + args[2] + "'\n i queue");
+            } catch (e) {
+                msg.channel.send("Det skjedde en feil med queue, prøv igjen");
+                console.log("Queue error (add): \n" + e);
+            }
+            break;
 
+        case "remove":
+            if (queue.indexOf(args[2]) > -1) {
+                try {
+                    queue.splice(queue.indexOf(args[2], 1));
+                    msg.channel.send(args[2] + "\n har blitt fjernet fra queue");
+                } catch (e) {
+                    msg.channel.send("Det skjedde en feil med queue, prøv igjen");
+                    console.log("Queue error(remove): \n" + e);
+                }
+            } else {
+                msg.channel.send("Denne adressen er ikke listet i queue");
+            }
+            break;
+        default:
+            const util = require("util");
+            if (queue.length > 0) {
+                msg.channel.send(util.inspect(queue));
+                break;
+            }
+            msg.channel.send("Queue er tom");
+            break;
+    }
+    return queue;
 }
 
 module.exports.skip = function skip(msg) {
