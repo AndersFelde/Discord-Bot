@@ -44,9 +44,13 @@ module.exports.play = async function (sLink, msg, server) {
         return;
     }
 
+    if (!msg.guild.voiceConnection) {
+        msg.member.voiceChannel.join().then(function (conn) {
+            play(conn, msg)
+        })
+    }
 
     function play(conn, msg, queue) {
-        console.log(server.queue);
         if (!server.queue) {
             server.queue = queue;
         }
@@ -58,6 +62,7 @@ module.exports.play = async function (sLink, msg, server) {
         server.dispatcher.on("end", function (x, q) {
             if (x == "stop") {
                 conn.disconnect();
+                msg.channel.send("Stoppet avspilling av sang");
                 return;
             } else if (x == "skip") {
                 play(conn, msg, q);
@@ -68,25 +73,17 @@ module.exports.play = async function (sLink, msg, server) {
             queue = require("../index").musicQueue;
             if (queue[0]) {
                 play(conn, msg, queue);
-
             } else {
                 conn.disconnect();
             }
         })
 
-        return server.dispatcher;
+        exports.dispatcher = server.dispatcher;
+        return;
 
     }
 
 
-    if (!msg.guild.voiceConnection) {
-        x = msg.member.voiceChannel.join().then(function (conn) {
-            k = play(conn, msg)
-            return k;
-
-        })
-        return await x;
-    }
 
 
 }
@@ -97,16 +94,14 @@ module.exports.stop = function stop(msg, server) {
         msg.channel.send("Det spilles ingen sang nå");
         return;
     }
+
     if (msg.guild.voiceConnection) {
         try {
             server.dispatcher.end("stop");
             msg.channel.send("Stoppet sangen");
-            /* msg.guild.voiceConnection.disconnect(); */
-
         } catch (e) {
             msg.channel.send("Det ser ut som det har skjedd noe feil med stoppingen");
             console.log(e);
-            console.log(server.dispatcher);
         }
         console.log("Stopped song");
     }
@@ -158,8 +153,8 @@ module.exports.queue = function queue(msg, args, queue) {
                     if (args[2] > queue.length) {
                         msg.channel.send("Tallet må være lavere enn lengden på queue");
                     } else {
-                        msg.channel.send(queue[args[2] - 1].title + "\n har blitt fjernet fra queue");
                         queue.splice(args[2] - 1, 1);
+                        msg.channel.send(queue[args[2] - 1].title + "\n har blitt fjernet fra queue");
                     }
                 } else if (queue.indexOf(args[2]) > -1) {
                     queue.splice(queue.indexOf(args[2], 1));

@@ -138,17 +138,8 @@ Bot.on("message", msg => {
                         }
                     }
 
-
-                    async function x() {
-                        y = require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]).then((r) => {
-                            return r;
-                        })
-                        return await y;
-                    }
-                    servers[msg.guild.id].dispatcher = x().then((p) => {
-                        return p;
-                    });
-
+                    require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]);
+                    servers[msg.guild.id].dispatcher = require("./elements/music").dispatcher;
                     break;
 
                 case "stop":
