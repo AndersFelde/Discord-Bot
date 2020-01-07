@@ -36,6 +36,10 @@ Bot.on("disconnect", () => {
 var servers = {};
 //for music
 
+
+
+
+
 Bot.on("message", msg => {
 
     if (msg.author.id !== Bot.user.id) {

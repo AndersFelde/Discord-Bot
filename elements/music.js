@@ -12,6 +12,18 @@ const checkUrl = (a) => {
     }
 }
 
+function embedMessage(message, link) {
+    embed = new Discord.RichEmbed()
+        .setColor('#0099ff')
+        .setTitle('MusicBot')
+        .setThumbnail('https://i.imgur.com/h2yoQh5.jpg')
+        .addField(message[0], message[1])
+        .addField('Link', link)
+        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
+
+    return embed;
+}
+
 module.exports.play = async function (sLink, msg, server) {
 
     if (sLink) {
@@ -30,7 +42,8 @@ module.exports.play = async function (sLink, msg, server) {
                 msg.channel.send("Klarte ikke finne info om sangen, er nok noe galt med linken");
                 return;
             }
-            msg.channel.send("Spiller nå:\n" + info.title);
+            /* msg.channel.send("Spiller nå:\n" + info.title); */
+            msg.channel.send(embedMessage(["Spiller nå", info.title], sLink));
         });
 
     } else if (server.queue.length == 0) {
@@ -57,7 +70,10 @@ module.exports.play = async function (sLink, msg, server) {
         server.dispatcher = conn.playStream(ytdl(server.queue[0].link, {
             filter: "audioonly"
         }));
-        if (server.queue[0].title) msg.channel.send("Spiller nå:\n" + server.queue[0].title);
+        if (server.queue[0].title) {
+            /*  msg.channel.send("Spiller nå:\n" + server.queue[0].title); */
+            msg.channel.send(embedMessage(["Spiller nå", server.queue[0].title], server.queue[0].link))
+        }
         server.queue.shift();
         server.dispatcher.on("end", function (x, q) {
             if (x == "stop") {
@@ -74,6 +90,7 @@ module.exports.play = async function (sLink, msg, server) {
             if (queue[0]) {
                 play(conn, msg, queue);
             } else {
+                msg.channel.send("Da var det visst ikke noe mer å spille da");
                 conn.disconnect();
             }
         })
@@ -133,7 +150,8 @@ module.exports.queue = function queue(msg, args, queue) {
                         link: args[2]
                     }
                     queue.push(song);
-                    msg.channel.send("Har lag til \n'" + info.title + "'\n i queue");
+                    msg.channel.send("Har lagt til \n'" + info.title + "'\n i queue");
+                    msg.channel.send(embedMessage(["Har lagt til denne i queue", info.title], args[2]));
                 });
 
 
@@ -155,10 +173,12 @@ module.exports.queue = function queue(msg, args, queue) {
                     } else {
                         queue.splice(args[2] - 1, 1);
                         msg.channel.send(queue[args[2] - 1].title + "\n har blitt fjernet fra queue");
+                        msg.channel.send(embedMessage(["Fjernet fra queue", queue[args[2] - 1].title], queue[args[2] - 1].link));
                     }
                 } else if (queue.indexOf(args[2]) > -1) {
                     queue.splice(queue.indexOf(args[2], 1));
                     msg.channel.send(args[2] + "\n har blitt fjernet fra queue");
+                    msg.channel.send(embedMessage(["Fjernet fra queue", args[2]], args[2].link));
                 } else {
                     msg.channel.send("Denne adressen er ikke listet i queue");
                 }
