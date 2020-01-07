@@ -178,7 +178,11 @@ Bot.on("message", msg => {
                     require("./elements/music").skip(servers[msg.guild.id]);
                     break;
 
+                    //for music
+                    //
+
             }
+            exports.musicQueue = servers[msg.guild.id].queue
         }
 
     }
