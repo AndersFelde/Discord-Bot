@@ -22,9 +22,16 @@ module.exports.play = async function (sLink, msg, server) {
 
         song = {
             link: sLink,
-            title: sLink
         };
         server.queue.push(song);
+        ytdl.getInfo(sLink, function (err, info) {
+            if (err) {
+                console.log(err);
+                msg.channel.send("Klarte ikke finne info om sangen, er nok noe galt med linken");
+                return;
+            }
+            msg.channel.send("Spiller nå:\n" + info.title);
+        });
 
     } else if (server.queue.length == 0) {
         msg.channel.send("Det må være noen sanger i queue da");
@@ -46,7 +53,7 @@ module.exports.play = async function (sLink, msg, server) {
         server.dispatcher = conn.playStream(ytdl(server.queue[0].link, {
             filter: "audioonly"
         }));
-        msg.channel.send("Spiller nå:\n" + server.queue[0].title);
+        if (server.queue[0].title) msg.channel.send("Spiller nå:\n" + server.queue[0].title);
         server.queue.shift();
         server.dispatcher.on("end", function (x, q) {
             if (x == "stop") {
@@ -150,7 +157,7 @@ module.exports.queue = function queue(msg, args, queue) {
                     if (args[2] > queue.length) {
                         msg.channel.send("Tallet må være lavere enn lengden på queue");
                     } else {
-                        msg.channel.send(queue[args[2] - 1] + "\n har blitt fjernet fra queue");
+                        msg.channel.send(queue[args[2] - 1].title + "\n har blitt fjernet fra queue");
                         queue.splice(args[2] - 1, 1);
                     }
                 } else if (queue.indexOf(args[2]) > -1) {
