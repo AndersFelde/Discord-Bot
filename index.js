@@ -169,13 +169,13 @@ Bot.on("message", msg => {
 
                     var queue = servers[msg.guild.id].queue;
                     const queueArgs = content.substring(prefix.length).split(" ");
-                    console.log(queue);
                     servers[msg.guild.id].queue = require("./elements/music").queue(msg, queueArgs, queue);
-
                     break;
 
                 case "skip":
-                    require("./elements/music").skip(msg);
+                    if (!msg.guild.voiceConnection) break;
+                    if (servers[msg.guild.id].queue.length == 0) break;
+                    require("./elements/music").skip(servers[msg.guild.id]);
                     break;
 
             }
