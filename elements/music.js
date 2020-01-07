@@ -58,9 +58,10 @@ module.exports.play = async function (sLink, msg, server) {
             }
             console.log("ferdig med sang");
 
-            if (server.queue[0]) {
-                q = server.queue;
-                play(conn, msg, q);
+            queue = require("../index").musicQueue;
+            if (queue[0]) {
+                play(conn, msg, queue);
+
             } else {
                 conn.disconnect();
             }
