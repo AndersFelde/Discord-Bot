@@ -1,4 +1,12 @@
-module.exports.spam = function spam(ant, spam, msg) {
+module.exports.spam = function spam(msg, args) {
+    if (!(args.length < 3)) {
+        var ant = args[2];
+        var spam = args[1];
+    } else {
+        msg.reply("skriv hva jeg skal spamme, og hvor mange ganger");
+        return;
+    }
+
     const content = msg.content;
 
     if (spam.includes("214453967952805889") /* Anders */ ||

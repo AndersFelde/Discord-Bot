@@ -14,15 +14,11 @@ token = token.replace(/\s/g, '');
 
 const prefix = "!";
 
-try {
-    Bot.login(token);
-} catch (error) {
-    console.log("Feil token er oppgitt, boten startet derfor ikke");
-}
+Bot.login(token);
+
 
 Bot.on("ready", () => {
     console.log("Bot er online");
-
 });
 
 Bot.on("reconnecting", () => {
@@ -34,116 +30,90 @@ Bot.on("disconnect", () => {
 });
 
 var servers = {};
-//for music
-
-
-
-
 
 Bot.on("message", msg => {
 
     if (msg.author.id !== Bot.user.id) {
         //så den ikke svarer seg selv
-        var content = msg.content;
+        const content = msg.content;
         if (content.toLowerCase().includes("gay")) {
             msg.channel.send("<@" + msg.author.id + "> er gay")
         }
 
-        if (content.charAt(0) == prefix) {
-            const args = content.substring(prefix.length).toLowerCase().split(" ");
+        if (content.charAt(0) != prefix) return;
 
-            switch (args[0]) {
-                case "spam":
-                    if (!(args.length < 3)) {
-                        const ant = args[2];
-                        const spam = args[1];
+        const args = content.substring(prefix.length).toLowerCase().split(" ");
 
-                        const spamFunc = require("./elements/spam").spam;
-                        spamFunc(ant, spam, msg);
+        switch (args[0]) {
+            case "spam":
+                require("./elements/spam").spam(msg, args);
+                break;
+            case "h":
+            case "?":
+            case "help":
+                msg.channel.send(require("./elements/help").help());
+                break;
+            case "dick":
+                require("./elements/random").dick(msg);
+                break;
+            case "reddit":
+                let sub;
+                if (args[1]) {
+                    sub = args[1]
+                } else {
+                    sub = "dankmemes";
+                }
+                require("./elements/redditApi").post(sub, msg);
+                break;
+            case "play":
+                const argsPlay = content.substring(prefix.length).split(" ");
+                //pga det vil fucke med linker når det alltid blir til lowercase
+                if (!argsPlay[1]) argsPlay[1] = false;
 
-                    } else {
-                        msg.reply("skriv hva jeg skal spamme, og hvor mange ganger")
+                if (!servers[msg.guild.id]) {
+                    servers[msg.guild.id] = {
+                        queue: []
                     }
-                    break;
+                }
 
-                case "h":
-                case "?":
-                case "help":
+                require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]);
+                servers[msg.guild.id].dispatcher = require("./elements/music").dispatcher;
+                break;
 
-                    msg.channel.send(require("./elements/help").help());
-                    break;
+            case "stop":
+                if (!servers[msg.guild.id].dispatcher) {
+                    msg.channel.send("Det spilles ingen sanger nå");
+                    return;
+                }
+                require("./elements/music").stop(msg, servers[msg.guild.id]);
+                break;
 
-                case "dick":
+            case "queue":
 
-                    embedMessage = new Discord.RichEmbed()
-                        .setColor('#0099ff')
-                        .setTitle("DICK")
-                        .setImage('https://www.totstoteens.co.nz/wp-content/uploads/2018/08/drawings.jpg')
-                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
-                    msg.channel.send(embedMessage);
-                    break;
-
-                case "reddit":
-                    let sub;
-                    if (args[1]) {
-                        sub = args[1]
-                    } else {
-                        sub = "dankmemes";
+                if (!servers[msg.guild.id]) {
+                    servers[msg.guild.id] = {
+                        queue: []
                     }
-                    require("./elements/redditApi").post(sub, msg);
-                    break;
-                case "play":
-                    const argsPlay = content.substring(prefix.length).split(" ");
-                    //pga det vil fucke med linker når det alltid blir til lowercase
-                    if (!argsPlay[1]) {
-                        argsPlay[1] = false;
-                    }
+                }
 
-                    if (!servers[msg.guild.id]) {
-                        servers[msg.guild.id] = {
-                            queue: []
-                        }
-                    }
+                var queue = servers[msg.guild.id].queue;
+                const queueArgs = content.substring(prefix.length).split(" ");
+                servers[msg.guild.id].queue = require("./elements/music").queue(msg, queueArgs, queue);
+                break;
 
-                    require("./elements/music").play(argsPlay[1], msg, servers[msg.guild.id]);
-                    servers[msg.guild.id].dispatcher = require("./elements/music").dispatcher;
-                    break;
+            case "skip":
+                if (!msg.guild.voiceConnection) break;
+                if (servers[msg.guild.id].queue.length == 0) break;
+                require("./elements/music").skip(servers[msg.guild.id]);
+                break;
 
-                case "stop":
-                    if (!servers[msg.guild.id].dispatcher) {
-                        msg.channel.send("Det spilles ingen sanger nå");
-                        return;
-                    }
-                    require("./elements/music").stop(msg, servers[msg.guild.id]);
-                    break;
+            default:
+                msg.channel.send("Jeg skjønte ikke hva du mente, prøv '!h'");
+                break;
 
-                case "queue":
-
-                    if (!servers[msg.guild.id]) {
-                        servers[msg.guild.id] = {
-                            queue: []
-                        }
-                    }
-
-                    var queue = servers[msg.guild.id].queue;
-                    const queueArgs = content.substring(prefix.length).split(" ");
-                    servers[msg.guild.id].queue = require("./elements/music").queue(msg, queueArgs, queue);
-                    break;
-
-                case "skip":
-                    if (!msg.guild.voiceConnection) break;
-                    if (servers[msg.guild.id].queue.length == 0) break;
-                    require("./elements/music").skip(servers[msg.guild.id]);
-                    break;
-
-                default:
-                    msg.channel.send("Jeg skjønte ikke hva du mente, prøv '!h'");
-                    break;
-
-            }
-            if (servers[msg.guild.id] && servers[msg.guild.id].queue) {
-                exports.musicQueue = servers[msg.guild.id].queue
-            }
+        }
+        if (servers[msg.guild.id] && servers[msg.guild.id].queue) {
+            exports.musicQueue = servers[msg.guild.id].queue
         }
 
     }
