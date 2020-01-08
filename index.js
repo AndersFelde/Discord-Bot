@@ -67,58 +67,10 @@ Bot.on("message", msg => {
                     break;
 
                 case "h":
-                    embedMessage = new Discord.RichEmbed()
-                        .setColor('#0099ff')
-                        .setTitle('Help')
-                        .setDescription('Help for commands')
-                        .setThumbnail('https://i.imgur.com/h2yoQh5.jpg')
-                        .addField('!play', '[link](Uten parameter spiller den queue) Da spiller den av sangen i VC du er i')
-                        .addField('!queue', '[add:remove](Hvis du ikke legger til parameter lister den queue)')
-                        .addField('!stop', 'Stopper musikken')
-                        .addField('!skip', 'Skipper til neste sang i queuen')
-                        .addField('!dick', ';)')
-                        .addField('!spam', '"[Det du vil spamme], [Hvor mange ganger](ikke mer enn 50)"')
-                        .addField('Tagging', 'Hvis du tagger sander eller meg på spam så fucker det den som sender')
-                        .setTimestamp()
-                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
-
-                    msg.channel.send(embedMessage);
-                    break;
                 case "?":
-                    embedMessage = new Discord.RichEmbed()
-                        .setColor('#0099ff')
-                        .setTitle('Help')
-                        .setDescription('Help for commands')
-                        .setThumbnail('https://i.imgur.com/h2yoQh5.jpg')
-                        .addField('!play', '[link](Uten parameter spiller den queue) Da spiller den av sangen i VC du er i')
-                        .addField('!queue', '[add:remove](Hvis du ikke legger til parameter lister den queue)')
-                        .addField('!stop', 'Stopper musikken')
-                        .addField('!skip', 'Skipper til neste sang i queuen')
-                        .addField('!dick', ';)')
-                        .addField('!spam', '"[Det du vil spamme], [Hvor mange ganger](ikke mer enn 50)"')
-                        .addField('Tagging', 'Hvis du tagger sander eller meg på spam så fucker det den som sender')
-                        .setTimestamp()
-                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
-
-                    msg.channel.send(embedMessage);
-                    break;
                 case "help":
-                    embedMessage = new Discord.RichEmbed()
-                        .setColor('#0099ff')
-                        .setTitle('Help')
-                        .setDescription('Help for commands')
-                        .setThumbnail('https://i.imgur.com/h2yoQh5.jpg')
-                        .addField('!play', '[link](Uten parameter spiller den queue) Da spiller den av sangen i VC du er i')
-                        .addField('!queue', '[add:remove](Hvis du ikke legger til parameter lister den queue)')
-                        .addField('!stop', 'Stopper musikken')
-                        .addField('!skip', 'Skipper til neste sang i queuen')
-                        .addField('!dick', ';)')
-                        .addField('!spam', '"[Det du vil spamme], [Hvor mange ganger](ikke mer enn 50)"')
-                        .addField('Tagging', 'Hvis du tagger sander eller meg på spam så fucker det den som sender')
-                        .setTimestamp()
-                        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
 
-                    msg.channel.send(embedMessage);
+                    msg.channel.send(require("./elements/help").help());
                     break;
 
                 case "dick":
@@ -132,41 +84,13 @@ Bot.on("message", msg => {
                     break;
 
                 case "reddit":
-                    api = require("./elements/redditApi");
+                    let sub;
                     if (args[1]) {
-                        sub = args[1];
+                        sub = args[1]
                     } else {
                         sub = "dankmemes";
                     }
-                    api.post(sub).then((post) => {
-                        if (post) {
-                            //sjekker om subreddit finnes
-                            const title = post.title;
-                            const author = post.author;
-
-                            var embedMessage = new Discord.RichEmbed()
-                                .setColor('#0099ff')
-                                .setTitle("Top reddit post fra r/" + sub)
-                                .addField("Title", title)
-
-                            if (post.link) {
-                                const link = post.link;
-                                embedMessage.addField("Link", link);
-                            } else if (post.img) {
-                                const img = post.img;
-                                embedMessage.setImage(img)
-                            }
-
-
-                            embedMessage
-                                .addField("Author", author)
-                                .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
-
-                            msg.channel.send(embedMessage);
-                        } else {
-                            msg.channel.send("Finner ikke den subredditen")
-                        }
-                    })
+                    require("./elements/redditApi").post(sub, msg);
                     break;
                 case "play":
                     const argsPlay = content.substring(prefix.length).split(" ");
@@ -212,8 +136,9 @@ Bot.on("message", msg => {
                     require("./elements/music").skip(servers[msg.guild.id]);
                     break;
 
-                    //for music
-                    //
+                default:
+                    msg.channel.send("Jeg skjønte ikke hva du mente, prøv '!h'");
+                    break;
 
             }
             if (servers[msg.guild.id] && servers[msg.guild.id].queue) {

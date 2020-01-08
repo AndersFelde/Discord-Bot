@@ -1,4 +1,5 @@
-module.exports.post = async function scrapeSubreddit(sub) {
+module.exports.post = async function scrapeSubreddit(sub, msg) {
+    const Discord = require("discord.js");
     const snoowrap = require("snoowrap");
     const isImageUrl = require("is-image-url");
 
@@ -12,8 +13,6 @@ module.exports.post = async function scrapeSubreddit(sub) {
         refreshToken: refreshToken
     });
 
-
-
     const subreddit = await api.getSubreddit(sub);
 
     const topPost = await subreddit.getTop({
@@ -21,11 +20,11 @@ module.exports.post = async function scrapeSubreddit(sub) {
         limit: 100
     }).catch(() => console.log("Finner ikke subreddit"));
     if (typeof (topPost) == "undefined" || topPost.length == 0) {
+        msg.channel.send("Finner ikke subreddit");
         return false;
     }
 
     const num = Math.floor((Math.random() * topPost.length) + 1);
-    console.log(num);
     let post = {
         title: topPost[num].title,
         author: topPost[num].author.name
@@ -39,11 +38,32 @@ module.exports.post = async function scrapeSubreddit(sub) {
         } else {
             post.link = url;
         }
-    } else
+    }
 
-        console.log(post);
-    /* console.log(post); */
-    return post;
+    //sjekker om subreddit finnes
+    const title = post.title;
+    const author = post.author;
+
+    var embedMessage = new Discord.RichEmbed()
+        .setColor('#0099ff')
+        .setTitle("Top reddit post fra r/" + sub)
+        .addField("Title", title)
+
+    if (post.link) {
+        const link = post.link;
+        embedMessage.addField("Link", link);
+    } else if (post.img) {
+        const img = post.img;
+        embedMessage.setImage(img)
+    }
+
+
+    embedMessage
+        .addField("Author", author)
+        .setFooter('AK-47', 'https://i.imgur.com/h2yoQh5.jpg');
+
+    msg.channel.send(embedMessage);
+
 };
 
 
