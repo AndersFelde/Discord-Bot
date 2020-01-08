@@ -67,9 +67,18 @@ module.exports.play = async function (sLink, msg, server) {
         if (!server.queue) {
             server.queue = queue;
         }
-        server.dispatcher = conn.playStream(ytdl(server.queue[0].link, {
-            filter: "audioonly"
-        }));
+        try {
+            server.dispatcher = conn.playStream(ytdl(server.queue[0].link, {
+                filter: "audioonly"
+            }));
+
+        } catch (error) {
+            console.log("MORDI er mann");
+            console.log(error);
+            msg.channel.send("Det har nok skjed noe feil, mest sannsynlig er ikke linken en yt-link");
+            conn.disconnect();
+            return;
+        }
         if (server.queue[0].title) {
             /*  msg.channel.send("Spiller nå:\n" + server.queue[0].title); */
             msg.channel.send(embedMessage(["Spiller nå", server.queue[0].title], server.queue[0].link))
