@@ -107,6 +107,12 @@ Bot.on("message", msg => {
                 require("./elements/music").skip(servers[msg.guild.id]);
                 break;
 
+            case "wiki":
+                require("./elements/wikiApi").wiki(msg, args[1]);
+                break;
+            case "ikkewiki":
+                require("./elements/wikiApi").ikkeWiki(msg, args[1]);
+                break;
             default:
                 msg.channel.send("Jeg skjønte ikke hva du mente, prøv '!h'");
                 break;
