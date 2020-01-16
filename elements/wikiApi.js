@@ -44,17 +44,21 @@ module.exports.wiki = function wiki(msg, arg) {
 }
 
 module.exports.ikkeWiki = function ikkeWiki(msg, page) {
-    const fetch = require('node-fetch');
-    url = "http://ikkepedia.org/api.php?action=parse&page=" + page + "&prop=wikitext"
+    const MWBot = require('mwbot');
+    let bot = new MWBot();
+    bot.setApiUrl('https://ikkepedia.org/api.php');
+    console.log("jo");
 
-    fetch(url)
-        .then(function (response) {
-            return response;
-        })
-        .then(function (response) {
-            console.log(response);
-        })
-    /* .catch(function (error) {
-        console.log(error);
-    }); */
+    bot.read('Kongen', {
+        timeout: 80
+    }).then((response) => {
+        // Success
+        // The MediaWiki API Result is somewhat unwieldy:
+        console.log(response.query.pages['1']['revisions'][0]['*']);
+    }).catch((err) => {
+        console.log(err);
+    });
+
+
+
 }
